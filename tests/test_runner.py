@@ -661,11 +661,16 @@ def test_a_gigantic_model_output_still_yields_a_scoreable_run():
 @pytest.mark.parametrize(
     "name,text",
     [
-        ("pseudo-marker prose", "\n".join(["Finally, câu trả lời là 2 ngày."] * 20_000)),
-        ("pseudo-marker braces", "\n".join(["Finally, {gần} đúng 2 ngày."] * 20_000)),
-        ("megabyte of junk", "z" * 1_000_000),
-        ("many real finals", "\n".join(['FINAL: {"answer": "a", "claims": []}'] * 5_000)),
-        ("deep brackets", "FINAL: " + "[" * 2_000 + "]" * 2_000),
+        # Explicit IDs keep the payload out of PYTEST_CURRENT_TEST on Windows.
+        pytest.param("pseudo-marker prose", "\n".join(["Finally, câu trả lời là 2 ngày."] * 20_000),
+                     id="pseudo-marker-prose"),
+        pytest.param("pseudo-marker braces", "\n".join(["Finally, {gần} đúng 2 ngày."] * 20_000),
+                     id="pseudo-marker-braces"),
+        pytest.param("megabyte of junk", "z" * 1_000_000, id="megabyte-of-junk"),
+        pytest.param("many real finals", "\n".join(['FINAL: {"answer": "a", "claims": []}'] * 5_000),
+                     id="many-real-finals"),
+        pytest.param("deep brackets", "FINAL: " + "[" * 2_000 + "]" * 2_000,
+                     id="deep-brackets"),
     ],
 )
 def test_normalisation_is_bounded_on_pathological_output(name, text):
@@ -1238,7 +1243,7 @@ def test_a_fixed_clock_makes_even_the_timing_deterministic():
 def _script(name, *args, expect=0):
     proc = subprocess.run(
         [sys.executable, f"scripts/{name}", *args],
-        capture_output=True, text=True, cwd=str(LAB_ROOT),
+        capture_output=True, text=True, encoding="utf-8", cwd=str(LAB_ROOT),
         env={"PATH": "/usr/bin:/bin"},
     )
     assert proc.returncode == expect, (proc.returncode, proc.stdout[-2000:], proc.stderr[-2000:])
@@ -1320,7 +1325,8 @@ def test_run_practice_refuses_the_real_path_without_credentials():
     proc = subprocess.run(
         [sys.executable, "scripts/run_practice.py", "--model", "real", "--brief",
          "pub-01-sla-hien-hanh"],
-        capture_output=True, text=True, cwd=str(LAB_ROOT), env={"PATH": "/usr/bin:/bin"},
+        capture_output=True, text=True, encoding="utf-8", cwd=str(LAB_ROOT),
+        env={"PATH": "/usr/bin:/bin"},
     )
     assert proc.returncode != 0
     combined = proc.stdout + proc.stderr

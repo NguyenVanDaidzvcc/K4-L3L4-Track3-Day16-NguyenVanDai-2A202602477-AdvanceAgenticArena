@@ -49,6 +49,8 @@ LAB_ROOT = Path(__file__).resolve().parent.parent
 if str(LAB_ROOT) not in sys.path:
     sys.path.insert(0, str(LAB_ROOT))
 
+from scripts._console import configure_stdio  # noqa: E402
+
 #: Khoảng cách tối thiểu để coi là vòng thi có gradient.
 GAP_TARGET = 20.0
 GAP_WEAK = 10.0
@@ -258,4 +260,5 @@ def main(argv=None) -> int:
 
 
 if __name__ == "__main__":
+    configure_stdio()
     raise SystemExit(main())

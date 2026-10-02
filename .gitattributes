@@ -1,0 +1,2 @@
+# Integrity checks hash arena files byte for byte; keep checkout endings stable.
+arena/*.py text eol=lf

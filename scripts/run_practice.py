@@ -77,6 +77,7 @@ from arena.runner import (  # noqa: E402
     run_brief,
     score_result,
 )
+from scripts._console import configure_stdio  # noqa: E402
 
 SCHEMA = "arena-scores/1"
 DEFAULT_OUT = LAB_ROOT / "runs" / "practice.json"
@@ -448,4 +449,5 @@ def main(argv=None) -> int:
 
 
 if __name__ == "__main__":
+    configure_stdio()
     raise SystemExit(main())

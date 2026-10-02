@@ -25,6 +25,8 @@ LAB_ROOT = Path(__file__).resolve().parent.parent
 if str(LAB_ROOT) not in sys.path:
     sys.path.insert(0, str(LAB_ROOT))
 
+from scripts._console import configure_stdio  # noqa: E402
+
 #: Băm MD5 của năm file ĐÓNG BĂNG. Sinh viên không được sửa chúng; nếu
 #: một dòng nào đó thay đổi thì mọi con số đã đo trong lab này hết hiệu
 #: lực. Đây cũng là mẻ kiểm tra chống gian lận rẻ nhất có thể có.
@@ -536,7 +538,7 @@ def check_determinism():
     for hashseed in ("0", "12345"):
         proc = subprocess.run(
             [sys.executable, "-c", DETERMINISM_SNIPPET.format(root=str(LAB_ROOT))],
-            capture_output=True, text=True, cwd=str(LAB_ROOT),
+            capture_output=True, text=True, encoding="utf-8", cwd=str(LAB_ROOT),
             env={**_clean_env(), "PYTHONHASHSEED": hashseed},
         )
         if proc.returncode != 0:
@@ -555,7 +557,10 @@ def check_determinism():
 def _clean_env():
     import os
 
-    return {k: v for k, v in os.environ.items() if not k.startswith("ARENA_")}
+    return {
+        **{k: v for k, v in os.environ.items() if not k.startswith("ARENA_")},
+        "PYTHONIOENCODING": "utf-8",
+    }
 
 
 def check_no_network():
@@ -587,7 +592,7 @@ def check_run_practice():
     proc = subprocess.run(
         [sys.executable, "scripts/run_practice.py", "--quiet", "--brief",
          "pub-01-sla-hien-hanh", "--out", str(out)],
-        capture_output=True, text=True, cwd=str(LAB_ROOT), env=_clean_env(),
+        capture_output=True, text=True, encoding="utf-8", cwd=str(LAB_ROOT), env=_clean_env(),
     )
     if proc.returncode != 0:
         return False, f"thoát {proc.returncode}: {proc.stderr.strip()[-300:]}"
@@ -607,7 +612,7 @@ def check_leaderboard():
     proc = subprocess.run(
         [sys.executable, "scripts/leaderboard.py", str(entry), "--json",
          "--baseline-total", "10"],
-        capture_output=True, text=True, cwd=str(LAB_ROOT), env=_clean_env(),
+        capture_output=True, text=True, encoding="utf-8", cwd=str(LAB_ROOT), env=_clean_env(),
     )
     if proc.returncode != 0:
         return False, f"thoát {proc.returncode}: {proc.stderr.strip()[-300:]}"
@@ -667,7 +672,7 @@ def check_student_layers():
 def check_pytest():
     proc = subprocess.run(
         [sys.executable, "-m", "pytest", "-q"],
-        capture_output=True, text=True, cwd=str(LAB_ROOT), env=_clean_env(),
+        capture_output=True, text=True, encoding="utf-8", cwd=str(LAB_ROOT), env=_clean_env(),
     )
     tail = proc.stdout.strip().splitlines()[-1] if proc.stdout.strip() else ""
     if proc.returncode != 0:
@@ -719,4 +724,5 @@ def main(argv=None) -> int:
 
 
 if __name__ == "__main__":
+    configure_stdio()
     raise SystemExit(main())

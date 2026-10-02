@@ -61,6 +61,7 @@ from arena.scorer import (  # noqa: E402
     _norm,
     _norm_lines,
 )
+from scripts._console import configure_stdio  # noqa: E402
 
 DEFAULT_RUN = LAB_ROOT / "runs" / "practice.json"
 
@@ -1195,4 +1196,5 @@ def main(argv=None) -> int:
 
 
 if __name__ == "__main__":
+    configure_stdio()
     raise SystemExit(main())
